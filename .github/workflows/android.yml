@@ -1,0 +1,26 @@
+name: Build Android APK
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.4.1
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Prepare build directory
+        run: mkdir -p build
+      - name: Import project resources
+        run: godot --headless --editor --path . --quit
+      - name: Export debug APK
+        run: godot --headless --path . --export-debug Android build/ForestSurvival3D.apk
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ForestSurvival3D-APK
+          path: build/ForestSurvival3D.apk
+          if-no-files-found: error
